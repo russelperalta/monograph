@@ -1,0 +1,48 @@
+import styles from "../styles/home.module.scss";
+import { client } from '../../sanity/lib/client';
+import { urlFor } from '../../sanity/lib/image';
+import Link from 'next/link';
+
+interface Post {
+  _id: string
+  title: string
+  slug: { current: string }
+  publishedAt: string
+  mainImage?: any
+  excerpt?: string
+}
+
+async function getLatestPost(): Promise<Post | null> {
+  return client.fetch(`
+    *[_type == "post"] | order(publishedAt desc)[0] {
+      _id,
+      title,
+      slug,
+      publishedAt,
+      mainImage,
+      excerpt
+    }
+  `)
+}
+
+export default async function Home() {
+  const latestPost = await getLatestPost();
+
+  return (
+    <div className={styles.page}>
+      <main className={styles.main}>
+        {latestPost && (
+          <div className={styles.home} data-theme="dark"
+              style={{
+                backgroundImage: `url(${urlFor(latestPost.mainImage).width(1200).url()})`,
+              }}
+              >
+              <Link href={`/${latestPost.slug.current}`}>
+                <h1>{latestPost.title}</h1>
+              </Link>
+            </div>
+        )}
+      </main>
+    </div>
+  );
+}

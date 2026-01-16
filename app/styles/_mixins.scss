@@ -1,0 +1,13 @@
+$mobile: 600px;
+$tablet: 900px;
+$desktop: 1200px;
+
+@mixin screen($breakpoint) {
+    @media screen and (min-width: $breakpoint) {
+        @content;
+    }
+}
+
+@mixin textFilter {
+    // filter: invert(1) grayscale(1) contrast(9);
+}

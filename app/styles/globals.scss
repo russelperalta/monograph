@@ -1,0 +1,32 @@
+@import './reset';
+@import './fonts';
+@import './mixins';
+@import './variables';
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+html, body {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.layout {
+    &Main {
+        display: grid;
+        width: 100%;
+        height: 100vh;
+        @include screen($desktop) {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    &Left, &Right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        h1 {
+            text-align: center;
+        }
+    }
+}

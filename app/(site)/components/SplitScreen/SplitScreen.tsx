@@ -1,0 +1,393 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { PortableText } from '@portabletext/react';
+import { urlFor } from '@/sanity/lib/image';
+import type { PostWithUrl } from '../../page';
+import Overlay from '../Overlay/Overlay';
+import styles from './SplitScreen.module.scss';
+
+interface SplitScreenScrollProps {
+  posts: PostWithUrl[];
+}
+
+const portableTextComponents = {
+  types: {
+    image: ({value}: any) => {
+      if (!value?.asset?._ref) {
+        return null;
+      }
+      return (
+        <img
+          src={urlFor(value).width(800).url()}
+          alt={value.alt || ''}
+          className={styles.portableImage}
+          loading="lazy"
+        />
+      );
+    },
+  },
+  block: {
+    normal: ({children}: any) => <p className={styles.paragraph}>{children}</p>,
+    h2: ({children}: any) => <h2 className={styles.h2}>{children}</h2>,
+    h3: ({children}: any) => <h3 className={styles.h3}>{children}</h3>,
+  },
+  marks: {
+    strong: ({children}: any) => <strong>{children}</strong>,
+    em: ({children}: any) => <em>{children}</em>,
+    link: ({children, value}: any) => (
+      <a 
+        href={value?.href} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className={styles.link}
+      >
+        {children}
+      </a>
+    ),
+  },
+};
+
+export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [overlayOpen, setOverlayOpen] = useState<boolean>(false);
+  const [overlayContent, setOverlayContent] = useState<any>(null);
+  const [overlayTitle, setOverlayTitle] = useState<string>('');
+  const [overlayGallery, setOverlayGallery] = useState<any[]>([]);
+  const isScrollingRef = useRef(false);
+  const isAnimatingRef = useRef(false);
+
+  // Mobile detect
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 900);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (posts.length === 0) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      // Don't handle scroll when overlay is open
+      if (overlayOpen) return;
+      
+      if (isAnimatingRef.current) return;
+      
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const rawIndex = scrollTop / windowHeight;
+      
+      const newIndex = Math.min(
+        Math.round(rawIndex),
+        posts.length - 1
+      );
+      
+      setActiveIndex(Math.max(0, newIndex));
+
+      if (posts[newIndex]) {
+        const hash = newIndex === 0 ? '' : `#${posts[newIndex].slug.current}`;
+        const currentPath = window.location.pathname + window.location.hash;
+        const targetPath = hash || '/';
+        
+        if (currentPath !== targetPath) {
+          window.history.replaceState(null, '', targetPath);
+        }
+      }
+
+      clearTimeout(scrollTimeout);
+      isScrollingRef.current = true;
+
+      scrollTimeout = setTimeout(() => {
+        isScrollingRef.current = false;
+        
+        // Only snap if close to section boundary
+        const distanceFromIndex = Math.abs(rawIndex - newIndex);
+        if (distanceFromIndex < 0.2) {
+          const targetScroll = newIndex * windowHeight;
+          
+          window.scrollTo({
+            top: targetScroll,
+            behavior: 'smooth'
+          });
+        }
+      }, 200);
+    };
+
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      
+      // Ignore clicks on overlay triggers (elements with role="button")
+      if (target.closest('[role="button"]')) {
+        return;
+      }
+      
+      const anchor = target.closest('a[href^="#"]') as HTMLAnchorElement;
+      
+      if (anchor && !isAnimatingRef.current) {
+        e.preventDefault();
+        
+        const hash = anchor.hash.slice(1);
+        const index = posts.findIndex(post => post.slug.current === hash);
+        
+        if (index !== -1) {
+          const newHash = index === 0 ? '' : `#${hash}`;
+          window.history.pushState(null, '', newHash || '/');
+          
+          isAnimatingRef.current = true;
+          setActiveIndex(index);
+          
+          window.scrollTo({
+            top: index * window.innerHeight,
+            behavior: 'smooth'
+          });
+          
+          setTimeout(() => {
+            isAnimatingRef.current = false;
+          }, 1000);
+        }
+      }
+    };
+
+    const handleHashChange = () => {
+      console.log('Hash changed to:', window.location.hash);
+      
+      if (isAnimatingRef.current) return;
+      if (overlayOpen) return; // Don't handle hash changes when overlay is open
+      
+      const hash = window.location.hash.slice(1);
+      const index = hash 
+        ? posts.findIndex(post => post.slug.current === hash)
+        : 0;
+        
+      if (index !== -1) {
+        isAnimatingRef.current = true;
+        setActiveIndex(index);
+        
+        window.scrollTo({
+          top: index * window.innerHeight,
+          behavior: 'smooth'
+        });
+        
+        setTimeout(() => {
+          isAnimatingRef.current = false;
+        }, 1000);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('hashchange', handleHashChange);
+    document.addEventListener('click', handleAnchorClick);
+    
+    // Initial setup
+    const hash = window.location.hash.slice(1);
+    const initialIndex = hash 
+      ? posts.findIndex(post => post.slug.current === hash)
+      : 0;
+      
+    if (initialIndex !== -1) {
+      setTimeout(() => {
+        setActiveIndex(initialIndex);
+        window.scrollTo({
+          top: initialIndex * window.innerHeight,
+          behavior: 'auto'
+        });
+      }, 100);
+    }
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('hashchange', handleHashChange);
+      document.removeEventListener('click', handleAnchorClick);
+      clearTimeout(scrollTimeout);
+    };
+  }, [posts, overlayOpen]); // Added overlayOpen dependency
+
+  if (!posts || posts.length === 0) {
+    return <div style={{ padding: '2rem', color: 'white' }}>No posts to display</div>;
+  }
+
+  const totalImagesHeight = (posts.length - 1) * 100;
+
+  // Overlay handlers
+  const handleOpenOverlay = (post: PostWithUrl) => {
+    // Save the current scroll position before opening overlay
+    setOverlayContent(post.leftContent);
+    setOverlayTitle(post.title);
+    setOverlayGallery(post.gallery || []);
+    setOverlayOpen(true);
+  };
+
+  const handleCloseOverlay = () => {
+    setOverlayOpen(false);
+    setTimeout(() => {
+      setOverlayTitle('');
+      setOverlayContent([]);
+      setOverlayGallery([]); 
+    }, 300);
+  };
+
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className={styles.mobileWrapper}>
+        {posts.map((post, index) => (
+          <section 
+            key={post._id} 
+            id={post.slug.current}
+            className={styles.mobileSection}
+          >
+            <div className={styles.mobileContent} style={(post.leftImageUrl || post.leftPreviewImageUrl) ? {
+                backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftImageUrl || post.leftPreviewImageUrl}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }: undefined}>
+              {index === 0 && (
+                <img src="/images/monograph-logo--white.svg" alt="Monograph Logo" draggable="false" />
+              )}
+              {post.year && <div className={styles.year}>{post.year}</div>}
+              <h2 
+                className={styles.title}
+                onClick={() => handleOpenOverlay(post)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleOpenOverlay(post);
+                  }
+                }}
+              >
+                {post.title}
+              </h2>
+            </div>
+          </section>
+        ))}
+        
+        {/* Overlay for mobile */}
+        <Overlay 
+          isOpen={overlayOpen}
+          onClose={handleCloseOverlay}
+          content={overlayContent || []}
+          title={overlayTitle}
+          gallery={overlayGallery}
+        />
+      </div>
+    );
+  }
+
+  // Desktop Layout
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.container}>
+        {/* Left side - Text slides UP (negative) */}
+        <div className={styles.leftSide}>
+          <div 
+            className={styles.leftContainer}
+            style={{
+              transform: `translateY(-${activeIndex * 100}vh)`,
+              transition: 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)'
+            }}
+          >
+            {posts.map((post, index) => (
+              <div key={post._id} id={post.slug.current} className={styles.leftSlide}>
+                {post.leftImageUrl && (
+                  <img
+                    src={post.leftImageUrl}
+                    alt={post.title}
+                    className={styles.leftImage}
+                  />
+                )}
+                <div className={styles.leftContent} style={post.leftPreviewImageUrl ? {
+                  backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftPreviewImageUrl}")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }: undefined}>
+                  {index === 0 && (
+                    <img src="/images/monograph-logo--white.svg" alt="Monograph Logo" draggable="false" />
+                  )}
+                  {post.year && <div className={styles.year}>{post.year}</div>}
+                  <h2 
+                    className={styles.title}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleOpenOverlay(post);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleOpenOverlay(post);
+                      }
+                    }}
+                  >
+                    {post.title}
+                  </h2>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right side - Images slide DOWN (positive) */}
+        <div className={styles.rightSide}>
+          <div 
+            className={styles.rightContainer}
+            style={{
+              transform: `translateY(calc(-${totalImagesHeight}vh + ${activeIndex * 100}vh))`,
+              transition: 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)'
+            }}
+          >
+            {[...posts].reverse().map((post, index) => (
+              <div key={post._id} className={styles.rightSlide}>
+                {post.rightImageUrl && (
+                  <img
+                    src={post.rightImageUrl}
+                    alt={post.title}
+                    className={styles.rightImage}
+                  />
+                )}
+                {post.rightContent && post.rightContent.length > 0 && (
+                  <div className={styles.rightContent}>
+                    <PortableText value={post.rightContent} components={portableTextComponents} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll sections */}
+      <div className={styles.scrollSections}>
+        {posts.map((post, index) => (
+          <div 
+            key={post._id} 
+            className={styles.scrollSection}
+            data-anchor={post.slug.current}
+          />
+        ))}
+      </div>
+
+      {/* Overlay */}
+      <Overlay 
+        isOpen={overlayOpen}
+        onClose={handleCloseOverlay}
+        content={overlayContent || []}
+        title={overlayTitle}
+        gallery={overlayGallery}
+      />
+    </div>
+  );
+}

@@ -1,0 +1,112 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  animation: fadeIn 0s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.overlayContent {
+  background: #fff;
+  color: #000;
+  width: 100%;
+  position: relative;
+  animation: slideLeft 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(0,0,0,0.1);
+  @include screen($tablet) {
+    width: 50%;
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: $padding-md;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.scrollContent {
+  padding: $padding-md;
+  overflow-y: auto;
+  flex: 1;
+  h2 {
+    margin-bottom: $margin-lg;
+  }
+  p {
+    margin-bottom: $margin-md;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+.overlayImage {
+  width: 100%;
+  height: auto;
+  margin: 2rem 0;
+  border-radius: 8px;
+}
+
+
+// Gallery
+.galleryGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+.galleryItem {
+    display: block;
+    img {
+        width: 100%;
+    }
+}

@@ -1,0 +1,24 @@
+@import './mixins';
+@import './variables';
+
+.main {
+  // display: flex;
+  // min-height: 100vh;
+  // width: 100%;
+  // flex-direction: column;
+  // align-items: flex-start;
+  .home {
+    width: 100%;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    h1 {
+      @include textFilter;
+      padding: $padding;
+    }
+  }
+}

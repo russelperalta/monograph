@@ -1,0 +1,173 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.wrapper {
+  min-height: 100vh;
+  background: #FFF;
+  color: #333;
+  display: none;
+  @include screen($tablet) {
+        display: block;
+    }
+}
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  z-index: 1;
+}
+.scrollSections {
+  position: relative;
+  z-index: 0;
+}
+.scrollSection {
+  height: 100vh;
+}
+// .section {
+    //   height: 100vh;
+    //   display: flex;
+    //   align-items: center;
+    //   justify-content: center;
+    //   padding: 0 80px;
+    // }
+
+// Both Sides
+.leftSide,
+.rightSide {
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+}
+.leftContainer,
+.rightContainer {
+  will-change: transform;
+}
+.leftSlide,
+.rightSlide {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.leftContent,
+.rightContent {
+    z-index: 2;
+    aspect-ratio: 2/3;
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: $padding $padding-md;
+    color: #FFF;
+}
+.leftImage,
+.rightImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+// Content
+.year {
+  font-size: 1rem;
+  margin-bottom: $margin;
+}
+.title {
+  // Add these styles for clickable titles
+  &[role="button"] {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    
+    &:hover {
+      transform: translateX(10px);
+    }
+    
+    // Optional: Add an arrow indicator
+    &::after {
+      content: '→';
+      opacity: 0;
+      margin-left: 1rem;
+      transition: opacity 0.3s ease;
+    }
+    
+    &:hover::after {
+      opacity: 1;
+    }
+    
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 8px;
+    }
+  }
+}
+// .description {
+// }
+
+// Custom
+:global(#home) {
+    .leftContent, .mobileContent {
+        justify-content: center;
+        aspect-ratio: unset;
+        h2 {
+            display: none;
+        }
+        img {
+            width: 250px;
+            margin: 0 auto;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none; // Safari
+            -moz-user-select: none;    // Firefox
+            -ms-user-select: none;     // IE/Edge
+            -webkit-touch-callout: none;
+        } 
+    } 
+}
+:global(body) {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    @include screen($tablet) {
+        scroll-snap-type: none;
+    }
+ 
+}
+
+// Mobile
+.mobileWrapper {
+  min-height: 100vh;
+}
+.mobileSection {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.mobileContent {
+    padding: $padding;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: #FFF;
+}
+// .mobileImageWrapper {
+//   width: 100%;
+//   img {
+//     width: 100%;
+//     height: auto;
+//   }
+// }
+
+
