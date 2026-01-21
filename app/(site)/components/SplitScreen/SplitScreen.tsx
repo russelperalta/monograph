@@ -28,23 +28,30 @@ const portableTextComponents = {
     },
   },
   block: {
-    normal: ({children}: any) => <p className={styles.paragraph}>{children}</p>,
+    normal: ({children}: any) => {
+      if (children.length === 1 && children[0] === '') return null;
+      return <p className={styles.paragraph}>{children}</p>;},
     h2: ({children}: any) => <h2 className={styles.h2}>{children}</h2>,
     h3: ({children}: any) => <h3 className={styles.h3}>{children}</h3>,
   },
   marks: {
     strong: ({children}: any) => <strong>{children}</strong>,
     em: ({children}: any) => <em>{children}</em>,
-    link: ({children, value}: any) => (
-      <a 
-        href={value?.href} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className={styles.link}
-      >
-        {children}
-      </a>
-    ),
+    link: ({children, value}: any) => {
+      const href = value?.href || '';
+      const isContactLink = href.startsWith('mailto:') || href.startsWith('tel:');
+
+        return (
+          <a 
+          href={href} 
+          target={isContactLink ? undefined : "_blank"}
+          rel={isContactLink ? undefined : "noopener noreferrer"}
+          className={styles.link}
+          >
+          {children}
+        </a>
+      )
+    },
   },
 };
 
@@ -240,38 +247,47 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
   if (isMobile) {
     return (
       <div className={styles.mobileWrapper}>
-        {posts.map((post, index) => (
-          <section 
-            key={post._id} 
-            id={post.slug.current}
-            className={styles.mobileSection}
-          >
-            <div className={styles.mobileContent} style={(post.leftImageUrl || post.leftPreviewImageUrl) ? {
-                backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftImageUrl || post.leftPreviewImageUrl}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }: undefined}>
-              {index === 0 && (
-                <img src="/images/monograph-logo--white.svg" alt="Monograph Logo" draggable="false" />
-              )}
-              {post.year && <div className={styles.year}>{post.year}</div>}
-              <h2 
-                className={styles.title}
-                onClick={() => handleOpenOverlay(post)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleOpenOverlay(post);
-                  }
-                }}
-              >
-                {post.title}
-              </h2>
-            </div>
-          </section>
-        ))}
+        {posts.map((post, index) =>   {
+          const isContact = post.slug.current ==='contact'
+          return (
+            <section 
+              key={post._id} 
+              id={post.slug.current}
+              className={styles.mobileSection}
+            >
+              <div className={styles.mobileContent} style={(post.leftImageUrl || post.leftPreviewImageUrl) ? {
+                  backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftImageUrl || post.leftPreviewImageUrl}")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }: undefined}>
+                {index === 0 && (
+                  <img src="/images/monograph-logo--white.svg" alt="Monograph Logo" draggable="false" />
+                )}
+                {post.year && <div className={styles.year}>{post.year}</div>}
+                <h2 
+                  className={styles.title}
+                  onClick={() => handleOpenOverlay(post)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleOpenOverlay(post);
+                    }
+                  }}
+                >
+                  {post.title}
+                </h2>
+                {isContact && (
+                  <div className={styles.rightContent}>
+                    <PortableText value={post.rightContent} components={portableTextComponents} />
+                  </div>
+                )}
+              </div>
+            </section>
+          )
+        }
+        )}
         
         {/* Overlay for mobile */}
         <Overlay 
@@ -330,8 +346,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
                         e.preventDefault();
                         handleOpenOverlay(post);
                       }
-                    }}
-                  >
+                  }}>
                     {post.title}
                   </h2>
                 </div>
@@ -350,7 +365,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
             }}
           >
             {[...posts].reverse().map((post, index) => (
-              <div key={post._id} className={styles.rightSlide}>
+              <div key={post._id} id={post.slug.current} className={styles.rightSlide}>
                 {post.rightImageUrl && (
                   <img
                     src={post.rightImageUrl}

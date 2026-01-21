@@ -18,6 +18,7 @@ interface Post {
   projectYear: string;
   gallery?: any[];
   order?: number;
+  contentType?: string;
   // Add New Fields (Step 1)
 }
 export interface PostWithUrl extends Omit<Post, 'leftImage' | 'leftPreviewImage' | 'rightImage' | 'leftBody' | 'rightBody' | 'projectYear'> {

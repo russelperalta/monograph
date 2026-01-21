@@ -76,10 +76,8 @@ export default function Header() {
 
         // Listen for hash changes
         window.addEventListener('hashchange', updateActiveSlug)
-        
         // Listen for scroll
         window.addEventListener('scroll', handleScroll, { passive: true })
-        
         // Check initial scroll position
         handleScroll()
         
@@ -95,6 +93,7 @@ export default function Header() {
     const handleNavClick = (slug: string) => {
         setActiveSlug(slug)
     }
+    const navPosts = posts.slice(1)
 
     return (
         <header className={styles.nav}>
@@ -106,14 +105,15 @@ export default function Header() {
                 </Link>
             </div>
             <ul className={styles.navItems}>
-                {posts.map((post) => (
+                {navPosts.map((post, index) => (
                     <li key={post.slug.current}>
                         <Link
                             href={`#${post.slug.current}`}
                             className={activeSlug === post.slug.current ? styles.active : ''}
                             onClick={() => handleNavClick(post.slug.current)}
                         >
-                            {post.order}
+                            {/* {post.order} */}
+                            {index + 1}
                         </Link>
                     </li>
                 ))}

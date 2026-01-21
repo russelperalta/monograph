@@ -6,6 +6,28 @@ export const postType = defineType({
   title: 'Post',
   type: 'document',
   icon: DocumentTextIcon,
+  orderings: [
+    {
+      title: 'Order, Ascending',
+      name: 'orderAsc',
+      by: [{field: 'order', direction: 'asc'}]
+    },
+    {
+      title: 'Order, Descending',
+      name: 'orderDesc',
+      by: [{field: 'order', direction: 'desc'}]
+    },
+    {
+      title: 'Title, A-Z',
+      name: 'titleAsc',
+      by: [{ field: 'title', direction: 'asc' }]
+    },
+    {
+      title: 'Title, Z-A',
+      name: 'titleDesc',
+      by: [{ field: 'title', direction: 'desc' }]
+    },
+  ],
   fieldsets: [
     {
       name: 'left',
@@ -25,8 +47,9 @@ export const postType = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Default Post', value: 'default' },
-          { title: 'Custom Post', value: 'custom' },
+          { title: 'Default', value: 'default' },
+          { title: 'Custom', value: 'custom' },
+          { title: 'Contact', value: 'contact'},
         ],
         layout: 'radio'
       },
@@ -78,7 +101,7 @@ export const postType = defineType({
           title: 'Alternative text',
         })
       ],
-      hidden: ({document}) => document?.contentType === 'custom',
+      hidden: ({document}) => document?.contentType === 'custom' || document?.contentType === 'contact',
       fieldset: 'left',
     }),
     defineField({
@@ -86,6 +109,7 @@ export const postType = defineType({
       title: 'Left Content',
       type: 'blockContent',
       fieldset: 'left',
+      hidden: ({document}) => document?.contentType === 'contact',
     }),
     defineField({
       name: 'rightImage',
@@ -100,6 +124,7 @@ export const postType = defineType({
           title: 'Alternative text',
         })
       ],
+      hidden: ({document}) => document?.contentType === 'contact',
       fieldset: 'right',
     }),
     defineField({
@@ -131,7 +156,7 @@ export const postType = defineType({
       options: {
         layout: 'grid',
       },
-      hidden: ({document}) => document?.contentType === 'custom',
+      hidden: ({document}) => document?.contentType === 'custom' || document?.contentType === 'contact',
     }),
     // defineField({
     //   name: 'categories',
@@ -143,7 +168,7 @@ export const postType = defineType({
       title: 'Project Year',
       type: 'number',
       validation: Rule => Rule.max(9999),
-      hidden: ({document}) => document?.contentType === 'custom',
+      hidden: ({document}) => document?.contentType === 'custom' || document?.contentType === 'contact' ,
       fieldset: 'left',
     }),
   ],
