@@ -2,9 +2,11 @@ import styles from "../styles/home.module.scss";
 import { client } from '../../sanity/lib/client';
 import { urlFor } from '../../sanity/lib/image';
 import type { PortableTextBlock } from '@portabletext/react';
-import Link from 'next/link';
+import { headers } from 'next/headers';
 import SplitScreenScroll from './components/SplitScreen/SplitScreen';
-import imageUrlBuilder from '@sanity/image-url';
+import Maintenance from './components/Maintenance/Maintentance';
+// import Link from 'next/link';
+// import imageUrlBuilder from '@sanity/image-url';
 
 interface Post {
   _id: string;
@@ -69,6 +71,10 @@ async function getPosts(): Promise<PostWithUrl[]> {
 export default async function Home() {
   const posts = await getPosts();
 
+  // Check domain
+  const headerStack = await headers();
+  const host = headerStack.get('host');
+
   if (!posts.length) {
     return (
       <div className={styles.page}>
@@ -78,7 +84,17 @@ export default async function Home() {
       </div>
     );
   }
-
+  
+  if (host !== 'dev.monograph.am') {
+    return (
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <Maintenance />
+        </main>
+      </div>
+    );
+  }
+  
   return (
     <div className={styles.page}>
       <main className={styles.main}>
