@@ -1,12 +1,12 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
 
 .wrapper {
   min-height: 100vh;
   background: #FFF;
   color: #000;
   display: none;
-  @include screen($tablet) {
+  @include m.screen(m.$tablet) {
         display: block;
     }
 }
@@ -62,7 +62,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: $padding $padding-md;
+  padding: v.$padding v.$padding-md;
   justify-content: center;
 }
 .leftContent {
@@ -82,7 +82,7 @@
 // Content
 .year {
   font-size: 1rem;
-  margin-bottom: $margin;
+  margin-bottom: v.$margin;
 }
 .title {
   // Add these styles for clickable titles
@@ -139,7 +139,7 @@
 :global(body) {
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
-    @include screen($tablet) {
+    @include m.screen(m.$tablet) {
         scroll-snap-type: none;
     }
  
@@ -168,7 +168,7 @@
           content:'';
           width: 2.5rem;
           font-weight: normal;
-          margin: 0 auto $margin-xl;
+          margin: 0 auto v.$margin-xl;
           border-bottom: 1px solid rgba(0,0,0,0.15);
         }
       }
@@ -176,7 +176,7 @@
     a {
       text-decoration: underline;
       display: inline-block;
-      margin-bottom: $margin-xl;
+      margin-bottom: v.$margin-xl;
       &:hover {
         text-decoration: none;
       }
@@ -197,7 +197,7 @@
   justify-content: center;
 }
 .mobileContent {
-    padding: $padding;
+    padding: v.$padding;
     flex-grow: 1;
     display: flex;
     flex-direction: column;

@@ -1,7 +1,4 @@
-@import './reset';
-@import './fonts';
-@import './mixins';
-@import './variables';
+@use 'index' as *;
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 html, body {

@@ -1,4 +1,4 @@
-@import './mixins';
+@use './mixins' as m;
 
 body, button {
     font-family: 'mainFont', sans-serif;
@@ -14,13 +14,13 @@ h1, h2, h3, h4, h5 {
 }
 h1 {
     font-size: 3rem;
-    @include screen($desktop) {
+    @include m.screen(m.$desktop) {
         font-size: 3.5rem;
     }
 }
 h2 {
     font-size: 2rem;
-    @include screen($desktop) {
+    @include m.screen(m.$desktop) {
         font-size: 2.5rem;
     }
 }

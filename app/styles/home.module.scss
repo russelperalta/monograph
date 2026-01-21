@@ -1,5 +1,5 @@
-@import './mixins';
-@import './variables';
+@use './mixins' as m;
+@use './variables' as v;
 
 .main {
   // display: flex;
@@ -17,8 +17,8 @@
     justify-content: center;
     text-align: center;
     h1 {
-      @include textFilter;
-      padding: $padding;
+      @include m.textFilter;
+      padding: v.$padding;
     }
   }
 }

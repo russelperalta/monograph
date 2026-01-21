@@ -1,5 +1,5 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
 
 .nav {
     .logo {
@@ -7,7 +7,7 @@
         top: 0;
         left: 0;
         z-index: 99;
-        padding: $padding-md;
+        padding: v.$padding-md;
         opacity: 0;
         transition: 0.3s opacity ease-in-out;
         &.scrolled {
@@ -32,7 +32,7 @@
         justify-content: center;
         color: rgba(255,255,255,0.4);
         gap: 1.5rem;
-        padding: $padding-lg;
+        padding: v.$padding-lg;
         z-index: 99;
         li {
             list-style-type: none;
