@@ -32,7 +32,10 @@
         justify-content: center;
         color: rgba(255,255,255,0.4);
         gap: 1.5rem;
-        padding: v.$padding-lg;
+        padding: v.$padding;
+        @include m.screen (m.$tablet) {
+            padding: v.$padding-lg;
+        }
         z-index: 99;
         li {
             list-style-type: none;

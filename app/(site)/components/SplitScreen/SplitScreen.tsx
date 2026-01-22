@@ -84,40 +84,142 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
   useEffect(() => {
     if (posts.length === 0) return;
 
-    const observerOptions = {
-      // Watch for when a section takes up 50% of the screen
-      threshold: 0.5,
-      root: isMobile ? mobileWrapperRef.current : null,
-    };
+    let scrollTimeout: NodeJS.Timeout;
 
-    const observer = new IntersectionObserver((entries) => {
-      // IMPORTANT: If overlay is open, do nothing
-      if (overlayOpen) return;
+    const handleScroll = () => {
+      if (overlayOpen || isAnimatingRef.current || isMobile) return;
 
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const slug = entry.target.getAttribute('data-anchor');
-          const index = posts.findIndex((p) => p.slug.current === slug);
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      
+      // 1. Better Index Calculation
+      // We use a "Bias" toward the top to make it easier to reach index 0
+      let newIndex;
+      if (scrollTop < windowHeight * 0.4) { 
+        newIndex = 0; // If you are in the top 40% of the first slide, stay at 0
+      } else {
+        newIndex = Math.min(Math.round(scrollTop / windowHeight), posts.length - 1);
+      }
 
-          if (index !== -1 && index !== activeIndex) {
-            setActiveIndex(index);
-            
-            // Logic to handle URL Hash
-            const hash = index === 0 ? '' : `#${slug}`;
-            if (window.location.hash !== hash) {
-              window.history.replaceState(null, '', hash || window.location.pathname);
-            }
+      const safeIndex = Math.max(0, newIndex);
+
+      if (safeIndex !== activeIndex) {
+        setActiveIndex(safeIndex);
+        const post = posts[safeIndex];
+        if (post) {
+          const hash = safeIndex === 0 ? '' : `#${post.slug.current}`;
+          const targetPath = hash || window.location.pathname;
+          if (window.location.hash !== hash) {
+            window.history.replaceState(null, '', targetPath);
           }
         }
-      });
-    }, observerOptions);
+      }
 
-    // Target the elements with the data-anchor attribute
-    const sections = document.querySelectorAll(`[data-anchor]`);
-    sections.forEach((section) => observer.observe(section));
+      // 2. Rigid Snap with "Home" Protection
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const targetScroll = safeIndex * windowHeight;
+        
+        // If we are at the very top, make sure we sit at exactly 0
+        if (safeIndex === 0 && scrollTop < 10) return; 
 
-    return () => observer.disconnect();
-  }, [posts, isMobile, activeIndex, overlayOpen]); // Re-added overlayOpen here
+        if (Math.abs(window.scrollY - targetScroll) > 5) {
+          window.scrollTo({
+            top: targetScroll,
+            behavior: 'smooth'
+          });
+        }
+      }, 150); // Increased slightly to give your scroll more "room" to finish
+    };
+
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      
+      // Ignore clicks on overlay triggers (elements with role="button")
+      if (target.closest('[role="button"]')) {
+        return;
+      }
+      
+      const anchor = target.closest('a[href^="#"]') as HTMLAnchorElement;
+      
+      if (anchor && !isAnimatingRef.current) {
+        e.preventDefault();
+        
+        const hash = anchor.hash.slice(1);
+        const index = posts.findIndex(post => post.slug.current === hash);
+        
+        if (index !== -1) {
+          const newHash = index === 0 ? '' : `#${hash}`;
+          window.history.pushState(null, '', newHash || '/');
+          
+          isAnimatingRef.current = true;
+          setActiveIndex(index);
+          
+          window.scrollTo({
+            top: index * window.innerHeight,
+            behavior: 'auto'
+          });
+          
+          setTimeout(() => {
+            isAnimatingRef.current = false;
+          }, 1000);
+        }
+      }
+    };
+
+    const handleHashChange = () => {
+      console.log('Hash changed to:', window.location.hash);
+      
+      if (isAnimatingRef.current) return;
+      if (overlayOpen) return; // Don't handle hash changes when overlay is open
+      
+      const hash = window.location.hash.slice(1);
+      const index = hash 
+        ? posts.findIndex(post => post.slug.current === hash)
+        : 0;
+        
+      if (index !== -1) {
+        isAnimatingRef.current = true;
+        setActiveIndex(index);
+        
+        window.scrollTo({
+          top: index * window.innerHeight,
+          behavior: 'auto'
+        });
+        
+        setTimeout(() => {
+          isAnimatingRef.current = false;
+        }, 1000);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('hashchange', handleHashChange);
+    document.addEventListener('click', handleAnchorClick);
+    
+    // Initial setup
+    const hash = window.location.hash.slice(1);
+    const initialIndex = hash 
+      ? posts.findIndex(post => post.slug.current === hash)
+      : 0;
+      
+    if (initialIndex !== -1) {
+      setTimeout(() => {
+        setActiveIndex(initialIndex);
+        window.scrollTo({
+          top: initialIndex * window.innerHeight,
+          behavior: 'auto'
+        });
+      }, 100);
+    }
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('hashchange', handleHashChange);
+      document.removeEventListener('click', handleAnchorClick);
+      // clearTimeout(scrollTimeout);
+    };
+  }, [posts, overlayOpen]); // Added overlayOpen dependency
 
   if (!posts || posts.length === 0) {
     return <div style={{ padding: '2rem', color: 'white' }}>No posts to display</div>;

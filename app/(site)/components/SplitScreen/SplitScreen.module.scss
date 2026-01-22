@@ -151,11 +151,12 @@
     } 
 }
 :global(body) {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
     scroll-behavior: auto;
     @include m.screen(m.$tablet) {
         scroll-snap-type: none;
-    }
- 
+    } 
 }
 :global(#contact) {
   .title {
@@ -203,8 +204,6 @@
 // Mobile
 .mobileWrapper {
   min-height: 100dvh;
-  overflow-y: scroll;
-  overflow-x: hidden;
   // This creates the "rigid" snapping feel
   scroll-snap-type: y mandatory;
   // Ensures scrolling is smooth and snappy on iOS
@@ -216,7 +215,6 @@
   width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  scroll-margin-top: 1px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -228,6 +226,9 @@
     flex-direction: column;
     justify-content: flex-end;
     color: #FFF;
+    .rightContent {
+      padding: 0;
+    }
 }
 // .mobileImageWrapper {
 //   width: 100%;
