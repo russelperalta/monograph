@@ -1,3 +1,4 @@
+import MobileDebugger from "./components/MobileDebugger/MobileDebugger";
 
 export default function SiteLayout({
   children,
@@ -6,7 +7,9 @@ export default function SiteLayout({
 }) {
   return (
     <>
-      {children}
+      <MobileDebugger>
+        {children}
+      </MobileDebugger>
     </>
   )
 }
