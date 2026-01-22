@@ -215,6 +215,7 @@
   height: 100dvh;
   width: 100%;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
   scroll-margin-top: 1px;
   display: flex;
   flex-direction: column;
