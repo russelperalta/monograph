@@ -44,6 +44,8 @@
 .leftContainer,
 .rightContainer {
   will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .leftSlide,
 .rightSlide {

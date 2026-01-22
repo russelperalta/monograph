@@ -85,49 +85,46 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
     let scrollTimeout: NodeJS.Timeout;
 
     const handleScroll = () => {
-      // Don't handle scroll when overlay is open
-      if (overlayOpen) return;
-      
-      if (isAnimatingRef.current) return;
-      
+      if (overlayOpen || isAnimatingRef.current) return;
+
       const scrollTop = window.scrollY;
       const windowHeight = window.innerHeight;
+      
+      // 1. Only calculate the index if we've moved significantly
       const rawIndex = scrollTop / windowHeight;
-      
-      const newIndex = Math.min(
-        Math.round(rawIndex),
-        posts.length - 1
-      );
-      
-      setActiveIndex(Math.max(0, newIndex));
+      const newIndex = Math.min(Math.round(rawIndex), posts.length - 1);
+      const safeIndex = Math.max(0, newIndex);
 
-      if (posts[newIndex]) {
-        const hash = newIndex === 0 ? '' : `#${posts[newIndex].slug.current}`;
-        const currentPath = window.location.pathname + window.location.hash;
-        const targetPath = hash || '/';
-        
-        if (currentPath !== targetPath) {
-          window.history.replaceState(null, '', targetPath);
+      // 2. IMPORTANT: Only update state if the index actually changed
+      // This prevents React from trying to re-render the list 60 times a second
+      if (safeIndex !== activeIndex) {
+        setActiveIndex(safeIndex);
+
+        // 3. Only touch the history API if the URL needs to change
+        const post = posts[safeIndex];
+        if (post) {
+          const hash = safeIndex === 0 ? '' : `#${post.slug.current}`;
+          const targetPath = hash || window.location.pathname;
+          
+          // Check if we are already at this hash to avoid excessive calls
+          if (window.location.hash !== hash) {
+            window.history.replaceState(null, '', targetPath);
+          }
         }
       }
 
+      // 4. Snapping logic (Keep this inside the timeout as you had it)
       clearTimeout(scrollTimeout);
-      isScrollingRef.current = true;
-
       scrollTimeout = setTimeout(() => {
-        isScrollingRef.current = false;
-        
-        // Only snap if close to section boundary
-        const distanceFromIndex = Math.abs(rawIndex - newIndex);
-        if (distanceFromIndex < 0.2) {
-          const targetScroll = newIndex * windowHeight;
-          
+        const distanceFromIndex = Math.abs(rawIndex - safeIndex);
+        if (distanceFromIndex > 0.01 && distanceFromIndex < 0.2) {
+          // Only snap if we aren't already there
           window.scrollTo({
-            top: targetScroll,
-            behavior: 'auto'
+            top: safeIndex * windowHeight,
+            behavior: 'smooth'
           });
         }
-      }, 200);
+      }, 150);
     };
 
     const handleAnchorClick = (e: MouseEvent) => {
