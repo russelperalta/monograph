@@ -149,6 +149,7 @@
     scroll-behavior: smooth;
     @include m.screen(m.$tablet) {
         scroll-snap-type: none;
+        scroll-behavior: auto;
     }
  
 }
@@ -199,13 +200,16 @@
 .mobileWrapper {
   min-height: 100dvh;
   overflow-y: scroll;
+  overflow-x: hidden;
   // This creates the "rigid" snapping feel
   scroll-snap-type: y mandatory;
   // Ensures scrolling is smooth and snappy on iOS
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 .mobileSection {
-  min-height: 100dvh;
+  height: 100dvh;
+  width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   display: flex;

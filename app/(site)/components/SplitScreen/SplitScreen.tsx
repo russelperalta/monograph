@@ -63,6 +63,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
   const [overlayTitle, setOverlayTitle] = useState<string>('');
   const [overlayGallery, setOverlayGallery] = useState<any[]>([]);
   const isScrollingRef = useRef(false);
+  const mobileWrapperRef = useRef<HTMLDivElement>(null);
   const isAnimatingRef = useRef(false);
 
   // Mobile detect
@@ -85,46 +86,36 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
     let scrollTimeout: NodeJS.Timeout;
 
     const handleScroll = () => {
-      if (overlayOpen || isAnimatingRef.current) return;
+      if (overlayOpen || isAnimatingRef.current || isMobile) return;
 
       const scrollTop = window.scrollY;
       const windowHeight = window.innerHeight;
-      
-      // 1. Only calculate the index if we've moved significantly
       const rawIndex = scrollTop / windowHeight;
-      const newIndex = Math.min(Math.round(rawIndex), posts.length - 1);
-      const safeIndex = Math.max(0, newIndex);
+      const safeIndex = Math.min(Math.round(rawIndex), posts.length - 1);
 
-      // 2. IMPORTANT: Only update state if the index actually changed
-      // This prevents React from trying to re-render the list 60 times a second
+      // Update active index for the transform animations
       if (safeIndex !== activeIndex) {
-        setActiveIndex(safeIndex);
-
-        // 3. Only touch the history API if the URL needs to change
+        setActiveIndex(Math.max(0, safeIndex));
+        
+        // Update Hash
         const post = posts[safeIndex];
-        if (post) {
-          const hash = safeIndex === 0 ? '' : `#${post.slug.current}`;
-          const targetPath = hash || window.location.pathname;
-          
-          // Check if we are already at this hash to avoid excessive calls
-          if (window.location.hash !== hash) {
-            window.history.replaceState(null, '', targetPath);
-          }
+        if (post && window.location.hash !== `#${post.slug.current}`) {
+          window.history.replaceState(null, '', `#${post.slug.current}`);
         }
       }
 
-      // 4. Snapping logic (Keep this inside the timeout as you had it)
-      // clearTimeout(scrollTimeout);
-      // scrollTimeout = setTimeout(() => {
-      //   const distanceFromIndex = Math.abs(rawIndex - safeIndex);
-      //   if (distanceFromIndex > 0.01 && distanceFromIndex < 0.2) {
-      //     // Only snap if we aren't already there
-      //     window.scrollTo({
-      //       top: safeIndex * windowHeight,
-      //       behavior: 'smooth'
-      //     });
-      //   }
-      // }, 150);
+      // RIGID SNAP: Force the window to land on a section boundary
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        // Only snap if we aren't perfectly aligned (prevents infinite loops)
+        const targetScroll = safeIndex * windowHeight;
+        if (Math.abs(window.scrollY - targetScroll) > 1) {
+          window.scrollTo({
+            top: targetScroll,
+            behavior: 'smooth'
+          });
+        }
+      }, 100); // 100ms is the "sweet spot" for feeling responsive but firm
     };
 
     const handleAnchorClick = (e: MouseEvent) => {

@@ -86,15 +86,15 @@ export default async function Home() {
     );
   }
   
-  if (host !== 'dev.monograph.am') {
-    return (
-      <div className={styles.page}>
-        <main className={styles.main}>
-          <Maintenance />
-        </main>
-      </div>
-    );
-  }
+  // if (host !== 'dev.monograph.am') {
+  //   return (
+  //     <div className={styles.page}>
+  //       <main className={styles.main}>
+  //         <Maintenance />
+  //       </main>
+  //     </div>
+  //   );
+  // }
   
   return (
     <div className={styles.page}>
