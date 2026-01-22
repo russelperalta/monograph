@@ -206,17 +206,16 @@
   overflow-y: scroll;
   overflow-x: hidden;
   // This creates the "rigid" snapping feel
-  scroll-snap-type: y proximity;
+  // scroll-snap-type: y mandatory;
   // Ensures scrolling is smooth and snappy on iOS
-  -webkit-overflow-scrolling: touch;
+  // -webkit-overflow-scrolling: touch;
   // scroll-behavior: smooth;
 }
 .mobileSection {
   height: 100dvh;
   width: 100%;
-  scroll-snap-align: start;
-  scroll-margin-top: 1px;
-  transform: translate3d(0,0,0);
+  // scroll-snap-align: start;
+  // scroll-margin-top: 1px;
   display: flex;
   flex-direction: column;
   justify-content: center;
