@@ -69,7 +69,7 @@ export default function Overlay({ isOpen, onClose, content, title, gallery }: Ov
       
       // Save scroll position IMMEDIATELY
       scrollPositionRef.current = window.scrollY;
-      console.log('Overlay opening - saved scroll:', scrollPositionRef.current);
+      // console.log('Overlay opening - saved scroll:', scrollPositionRef.current);
       
       // Prevent scroll
       document.body.style.overflow = 'hidden';
@@ -83,7 +83,7 @@ export default function Overlay({ isOpen, onClose, content, title, gallery }: Ov
       wasOpenRef.current = false;
       
       const scrollY = scrollPositionRef.current;
-      console.log('Overlay closing - restoring scroll:', scrollY);
+      // console.log('Overlay closing - restoring scroll:', scrollY);
       
       document.removeEventListener('keydown', handleEscape);
       
@@ -96,7 +96,7 @@ export default function Overlay({ isOpen, onClose, content, title, gallery }: Ov
       // Restore scroll
       requestAnimationFrame(() => {
         window.scrollTo(0, scrollY);
-        console.log('Scroll restored to:', scrollY);
+        // console.log('Scroll restored to:', scrollY);
       });
     }
 
