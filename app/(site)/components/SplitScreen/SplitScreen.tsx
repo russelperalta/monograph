@@ -81,16 +81,17 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
     };
   }, []);
 
-  // Mobile scrolling
   useEffect(() => {
     if (posts.length === 0) return;
 
     const observerOptions = {
+      // Watch for when a section takes up 50% of the screen
       threshold: 0.5,
       root: isMobile ? mobileWrapperRef.current : null,
     };
 
     const observer = new IntersectionObserver((entries) => {
+      // IMPORTANT: If overlay is open, do nothing
       if (overlayOpen) return;
 
       entries.forEach((entry) => {
@@ -101,6 +102,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
           if (index !== -1 && index !== activeIndex) {
             setActiveIndex(index);
             
+            // Logic to handle URL Hash
             const hash = index === 0 ? '' : `#${slug}`;
             if (window.location.hash !== hash) {
               window.history.replaceState(null, '', hash || window.location.pathname);
@@ -110,65 +112,12 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
       });
     }, observerOptions);
 
+    // Target the elements with the data-anchor attribute
     const sections = document.querySelectorAll(`[data-anchor]`);
     sections.forEach((section) => observer.observe(section));
 
     return () => observer.disconnect();
-  }, [posts, isMobile, activeIndex, overlayOpen]);
-
-  // Add this separate effect for iOS scroll snapping
-  useEffect(() => {
-    if (!isMobile || posts.length === 0) return;
-    
-    const wrapper = mobileWrapperRef.current;
-    if (!wrapper) return;
-
-    let scrollTimeout: NodeJS.Timeout;
-
-    const snapToNearestSection = () => {
-      // Don't snap if overlay is open
-      if (overlayOpen) return;
-
-      const sections = document.querySelectorAll('[data-anchor]');
-      const scrollTop = wrapper.scrollTop;
-      const viewportHeight = window.innerHeight;
-
-      let nearestSection: Element | null = null;
-      let minDistance = Infinity;
-
-      sections.forEach((section) => {
-        const sectionTop = (section as HTMLElement).offsetTop;
-        const distance = Math.abs(scrollTop - sectionTop);
-        
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestSection = section;
-        }
-      });
-
-      if (nearestSection) {
-        wrapper.scrollTo({
-          top: (nearestSection as HTMLElement).offsetTop,
-          behavior: 'smooth'
-        });
-      }
-    };
-
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      
-      scrollTimeout = setTimeout(() => {
-        snapToNearestSection();
-      }, 150);
-    };
-
-    wrapper.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      wrapper.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
-    };
-  }, [isMobile, posts.length, overlayOpen]);
+  }, [posts, isMobile, activeIndex, overlayOpen]); // Re-added overlayOpen here
 
   if (!posts || posts.length === 0) {
     return <div style={{ padding: '2rem', color: 'white' }}>No posts to display</div>;
