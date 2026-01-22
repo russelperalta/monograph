@@ -113,7 +113,7 @@ export default function Header() {
                             onClick={() => handleNavClick(post.slug.current)}
                         >
                             {/* {post.order} */}
-                            {index + 1}
+                            {(index + 1).toString().padStart(2, '0')}
                         </Link>
                     </li>
                 ))}

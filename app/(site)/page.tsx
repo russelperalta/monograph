@@ -3,6 +3,7 @@ import { client } from '../../sanity/lib/client';
 import { urlFor } from '../../sanity/lib/image';
 import type { PortableTextBlock } from '@portabletext/react';
 import { headers } from 'next/headers';
+import Header from './components/Header/Header'
 import SplitScreenScroll from './components/SplitScreen/SplitScreen';
 import Maintenance from './components/Maintenance/Maintentance';
 // import Link from 'next/link';
@@ -97,6 +98,7 @@ export default async function Home() {
   
   return (
     <div className={styles.page}>
+      <Header />
       <main className={styles.main}>
         <SplitScreenScroll posts={posts} />
       </main>
