@@ -124,7 +124,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
           
           window.scrollTo({
             top: targetScroll,
-            behavior: 'smooth'
+            behavior: 'auto'
           });
         }
       }, 200);
@@ -155,7 +155,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
           
           window.scrollTo({
             top: index * window.innerHeight,
-            behavior: 'smooth'
+            behavior: 'auto'
           });
           
           setTimeout(() => {
@@ -182,7 +182,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
         
         window.scrollTo({
           top: index * window.innerHeight,
-          behavior: 'smooth'
+          behavior: 'auto'
         });
         
         setTimeout(() => {
@@ -242,103 +242,31 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
       setOverlayGallery([]); 
     }, 300);
   };
-
-  // Mobile Layout
-  if (isMobile) {
-    return (
-      <div className={styles.mobileWrapper}>
-        {posts.map((post, index) =>   {
-          const isContact = post.slug.current ==='contact'
-          return (
-            <section 
-              key={post._id} 
-              id={post.slug.current}
-              className={styles.mobileSection}
-            >
-              <div className={styles.mobileContent} style={(post.leftImageUrl || post.leftPreviewImageUrl) ? {
-                  backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftImageUrl || post.leftPreviewImageUrl}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }: undefined}>
-                {index === 0 && (
-                  <img src="/images/monograph-logo--white.svg" alt="Monograph Logo" draggable="false" />
-                )}
-                {post.year && <div className={styles.year}>{post.year}</div>}
-                <h2 
-                  className={styles.title}
-                  onClick={() => handleOpenOverlay(post)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleOpenOverlay(post);
-                    }
-                  }}
-                >
-                  {post.title}
-                </h2>
-                {isContact && (
-                  <div className={styles.rightContent}>
-                    <PortableText value={post.rightContent} components={portableTextComponents} />
-                  </div>
-                )}
-              </div>
-            </section>
-          )
-        }
-        )}
-        
-        {/* Overlay for mobile */}
-        <Overlay 
-          isOpen={overlayOpen}
-          onClose={handleCloseOverlay}
-          content={overlayContent || []}
-          title={overlayTitle}
-          gallery={overlayGallery}
-        />
-      </div>
-    );
-  }
-
-  // Desktop Layout
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.container}>
-        {/* Left side - Text slides UP (negative) */}
-        <div className={styles.leftSide}>
-          <div 
-            className={styles.leftContainer}
-            style={{
-              transform: `translateY(-${activeIndex * 100}vh)`,
-              transition: 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)'
-            }}
-          >
-            {posts.map((post, index) => (
-              <div key={post._id} id={post.slug.current} className={styles.leftSlide}>
-                {post.leftImageUrl && (
-                  <img
-                    src={post.leftImageUrl}
-                    alt={post.title}
-                    className={styles.leftImage}
-                  />
-                )}
-                <div className={styles.leftContent} style={post.leftPreviewImageUrl ? {
-                  backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftPreviewImageUrl}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }: undefined}>
+    <>
+      {/* Mobile Layout */}
+      {isMobile ? (
+        <div className={styles.mobileWrapper}>
+          {posts.map((post, index) =>   {
+            const isContact = post.slug.current ==='contact'
+            return (
+              <section 
+                key={post._id} 
+                id={post.slug.current}
+                className={styles.mobileSection}
+              >
+                <div className={styles.mobileContent} style={(post.leftImageUrl || post.leftPreviewImageUrl) ? {
+                    backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftImageUrl || post.leftPreviewImageUrl}")`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }: undefined}>
                   {index === 0 && (
                     <img src="/images/monograph-logo--white.svg" alt="Monograph Logo" draggable="false" />
                   )}
                   {post.year && <div className={styles.year}>{post.year}</div>}
                   <h2 
                     className={styles.title}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleOpenOverlay(post);
-                    }}
+                    onClick={() => handleOpenOverlay(post)}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
@@ -346,63 +274,131 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
                         e.preventDefault();
                         handleOpenOverlay(post);
                       }
-                  }}>
+                    }}
+                  >
                     {post.title}
                   </h2>
+                  {isContact && (
+                    <div className={styles.rightContent}>
+                      <PortableText value={post.rightContent} components={portableTextComponents} />
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right side - Images slide DOWN (positive) */}
-        <div className={styles.rightSide}>
-          <div 
-            className={styles.rightContainer}
-            style={{
-              transform: `translateY(calc(-${totalImagesHeight}vh + ${activeIndex * 100}vh))`,
-              transition: 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)'
-            }}
-          >
-            {[...posts].reverse().map((post, index) => (
-              <div key={post._id} id={post.slug.current} className={styles.rightSlide}>
-                {post.rightImageUrl && (
-                  <img
-                    src={post.rightImageUrl}
-                    alt={post.title}
-                    className={styles.rightImage}
-                  />
-                )}
-                {post.rightContent && post.rightContent.length > 0 && (
-                  <div className={styles.rightContent}>
-                    <PortableText value={post.rightContent} components={portableTextComponents} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Scroll sections */}
-      <div className={styles.scrollSections}>
-        {posts.map((post, index) => (
-          <div 
-            key={post._id} 
-            className={styles.scrollSection}
-            data-anchor={post.slug.current}
+              </section>
+            )
+          }
+          )}
+          {/* Overlay for mobile */}
+          <Overlay 
+            isOpen={overlayOpen}
+            onClose={handleCloseOverlay}
+            content={overlayContent || []}
+            title={overlayTitle}
+            gallery={overlayGallery}
           />
-        ))}
-      </div>
+        </div>
+      ) : (
+        // Desktop Layout
+        <div className={styles.wrapper}>
+          <div className={styles.container}>
+            {/* Left side - Text slides UP (negative) */}
+            <div className={styles.leftSide}>
+              <div 
+                className={styles.leftContainer}
+                style={{
+                  transform: `translateY(-${activeIndex * 100}vh)`,
+                  transition: 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)'
+                }}
+              >
+                {posts.map((post, index) => (
+                  <div key={post._id} id={post.slug.current} className={styles.leftSlide}>
+                    {post.leftImageUrl && (
+                      <img
+                        src={post.leftImageUrl}
+                        alt={post.title}
+                        className={styles.leftImage}
+                      />
+                    )}
+                    <div className={styles.leftContent} style={post.leftPreviewImageUrl ? {
+                      backgroundImage: `linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url("${post.leftPreviewImageUrl}")`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }: undefined}>
+                      {index === 0 && (
+                        <img src="/images/monograph-logo--white.svg" alt="Monograph Logo" draggable="false" />
+                      )}
+                      {post.year && <div className={styles.year}>{post.year}</div>}
+                      <h2 
+                        className={styles.title}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleOpenOverlay(post);
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleOpenOverlay(post);
+                          }
+                      }}>
+                        {post.title}
+                      </h2>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-      {/* Overlay */}
-      <Overlay 
-        isOpen={overlayOpen}
-        onClose={handleCloseOverlay}
-        content={overlayContent || []}
-        title={overlayTitle}
-        gallery={overlayGallery}
-      />
-    </div>
+            {/* Right side - Images slide DOWN (positive) */}
+            <div className={styles.rightSide}>
+              <div 
+                className={styles.rightContainer}
+                style={{
+                  transform: `translateY(calc(-${totalImagesHeight}vh + ${activeIndex * 100}vh))`,
+                  transition: 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)'
+                }}
+              >
+                {[...posts].reverse().map((post, index) => (
+                  <div key={post._id} id={post.slug.current} className={styles.rightSlide}>
+                    {post.rightImageUrl && (
+                      <img
+                        src={post.rightImageUrl}
+                        alt={post.title}
+                        className={styles.rightImage}
+                      />
+                    )}
+                    {post.rightContent && post.rightContent.length > 0 && (
+                      <div className={styles.rightContent}>
+                        <PortableText value={post.rightContent} components={portableTextComponents} />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Scroll sections */}
+          <div className={styles.scrollSections}>
+            {posts.map((post, index) => (
+              <div 
+                key={post._id} 
+                className={styles.scrollSection}
+                data-anchor={post.slug.current}
+              />
+            ))}
+          </div>
+          {/* Overlay */}
+          <Overlay 
+            isOpen={overlayOpen}
+            onClose={handleCloseOverlay}
+            content={overlayContent || []}
+            title={overlayTitle}
+            gallery={overlayGallery}
+          />
+        </div>
+      )}
+    </>
   );
 }

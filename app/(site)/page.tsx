@@ -38,9 +38,9 @@ export interface PostWithUrl extends Omit<Post, 'leftImage' | 'leftPreviewImage'
 function transformPost(post: Post): PostWithUrl {
   return {
     ...post,
-    leftImageUrl: post.leftImage ? urlFor(post.leftImage).width(1200).url() : '',
-    leftPreviewImageUrl: post.leftPreviewImage ? urlFor(post.leftPreviewImage).width(1200).url() : '',
-    rightImageUrl: post.rightImage ? urlFor(post.rightImage).width(1200).url() : '',
+    leftImageUrl: post.leftImage ? urlFor(post.leftImage).width(800).quality(75).auto('format').url() : '',
+    leftPreviewImageUrl: post.leftPreviewImage ? urlFor(post.leftPreviewImage).width(800).quality(75).auto('format').url() : '',
+    rightImageUrl: post.rightImage ? urlFor(post.rightImage).width(800).quality(75).auto('format').url() : '',
     year: post.projectYear?.toString() || '',
     leftContent: post.leftBody || [],
     rightContent: post.rightBody || [],
