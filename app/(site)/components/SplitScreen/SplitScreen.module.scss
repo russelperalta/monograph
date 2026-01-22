@@ -205,7 +205,7 @@
   scroll-snap-type: y mandatory;
   // Ensures scrolling is smooth and snappy on iOS
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+  // scroll-behavior: smooth;
 }
 .mobileSection {
   height: 100dvh;
