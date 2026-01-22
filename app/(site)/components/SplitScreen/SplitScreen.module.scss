@@ -198,6 +198,11 @@
 // Mobile
 .mobileWrapper {
   min-height: 100dvh;
+  overflow-y: scroll;
+  // This creates the "rigid" snapping feel
+  scroll-snap-type: y mandatory;
+  // Ensures scrolling is smooth and snappy on iOS
+  -webkit-overflow-scrolling: touch;
 }
 .mobileSection {
   min-height: 100dvh;

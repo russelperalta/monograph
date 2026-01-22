@@ -114,17 +114,17 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
       }
 
       // 4. Snapping logic (Keep this inside the timeout as you had it)
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const distanceFromIndex = Math.abs(rawIndex - safeIndex);
-        if (distanceFromIndex > 0.01 && distanceFromIndex < 0.2) {
-          // Only snap if we aren't already there
-          window.scrollTo({
-            top: safeIndex * windowHeight,
-            behavior: 'smooth'
-          });
-        }
-      }, 150);
+      // clearTimeout(scrollTimeout);
+      // scrollTimeout = setTimeout(() => {
+      //   const distanceFromIndex = Math.abs(rawIndex - safeIndex);
+      //   if (distanceFromIndex > 0.01 && distanceFromIndex < 0.2) {
+      //     // Only snap if we aren't already there
+      //     window.scrollTo({
+      //       top: safeIndex * windowHeight,
+      //       behavior: 'smooth'
+      //     });
+      //   }
+      // }, 150);
     };
 
     const handleAnchorClick = (e: MouseEvent) => {
