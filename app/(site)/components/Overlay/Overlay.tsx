@@ -22,7 +22,7 @@ const portableTextComponents = {
       }
       return (
         <img
-          src={urlFor(value).width(1200).url()}
+          src={urlFor(value).width(800).url()}
           alt={value.alt || ''}
           className={styles.overlayImage}
           loading="lazy"
@@ -128,7 +128,7 @@ export default function Overlay({ isOpen, onClose, content, title, gallery }: Ov
                 {gallery.map((img, index) => (
                     <div key={index} className={styles.galleryItem}>
                         <img
-                            src={urlFor(img).width(1200).url()}
+                            src={urlFor(img).width(800).url()}
                             alt={`${title || 'Gallery'} image ${index + 1}`}
                             className={styles.galleryImage}
                             loading="lazy"
