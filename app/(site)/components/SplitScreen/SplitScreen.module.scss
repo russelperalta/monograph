@@ -146,10 +146,9 @@
     } 
 }
 :global(body) {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     @include m.screen(m.$tablet) {
         scroll-snap-type: none;
-        scroll-behavior: auto;
     }
  
 }

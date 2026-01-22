@@ -90,32 +90,44 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
 
       const scrollTop = window.scrollY;
       const windowHeight = window.innerHeight;
-      const rawIndex = scrollTop / windowHeight;
-      const safeIndex = Math.min(Math.round(rawIndex), posts.length - 1);
+      
+      // Use a tiny epsilon (0.1) to detect if we are near the very top
+      let newIndex;
+      if (scrollTop < 50) {
+        newIndex = 0;
+      } else {
+        newIndex = Math.min(Math.round(scrollTop / windowHeight), posts.length - 1);
+      }
 
-      // Update active index for the transform animations
+      const safeIndex = Math.max(0, newIndex);
+
       if (safeIndex !== activeIndex) {
-        setActiveIndex(Math.max(0, safeIndex));
-        
-        // Update Hash
+        setActiveIndex(safeIndex);
+
         const post = posts[safeIndex];
-        if (post && window.location.hash !== `#${post.slug.current}`) {
-          window.history.replaceState(null, '', `#${post.slug.current}`);
+        if (post) {
+          const hash = safeIndex === 0 ? '' : `#${post.slug.current}`;
+          // Use window.location.pathname to go back to "Home" (no hash)
+          const targetPath = hash || window.location.pathname;
+          
+          if (window.location.hash !== hash) {
+            window.history.replaceState(null, '', targetPath);
+          }
         }
       }
 
-      // RIGID SNAP: Force the window to land on a section boundary
+      // Rigid Snap Logic
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
-        // Only snap if we aren't perfectly aligned (prevents infinite loops)
         const targetScroll = safeIndex * windowHeight;
-        if (Math.abs(window.scrollY - targetScroll) > 1) {
+        // Only snap if we aren't already within 2px of the target
+        if (Math.abs(window.scrollY - targetScroll) > 2) {
           window.scrollTo({
             top: targetScroll,
             behavior: 'smooth'
           });
         }
-      }, 100); // 100ms is the "sweet spot" for feeling responsive but firm
+      }, 100);
     };
 
     const handleAnchorClick = (e: MouseEvent) => {
