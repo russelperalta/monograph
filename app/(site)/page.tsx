@@ -100,8 +100,7 @@ export default async function Home() {
     <div className={styles.page}>
       <Header />
       <main className={styles.main}>
-        {/* <SplitScreenScroll posts={posts} /> */}
-        Total Posts: {posts.length}
+        <SplitScreenScroll posts={posts} />
       </main>
     </div>
   );
