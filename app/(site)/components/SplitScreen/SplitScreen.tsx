@@ -212,7 +212,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('hashchange', handleHashChange);
       document.removeEventListener('click', handleAnchorClick);
-      clearTimeout(scrollTimeout);
+      // clearTimeout(scrollTimeout);
     };
   }, [posts, overlayOpen]); // Added overlayOpen dependency
 
