@@ -10,7 +10,7 @@
         opacity: 0;
         transition: 0.3s opacity ease-in-out;
         padding: calc(v.$padding + env(safe-area-inset-top));
-        z-index: 100;
+        z-index: 99;
         @include m.screen (m.$tablet) {
             padding: v.$padding-md;
         }
@@ -27,7 +27,6 @@
     }
     &Items {
         position: fixed;
-        top: 0;
         right: 0;
         height: 100dvh;
         display: flex;
@@ -36,7 +35,7 @@
         color: rgba(255,255,255,0.4);
         gap: 1.5rem;
         padding: calc(v.$padding + env(safe-area-inset-right));
-        z-index: 99;
+        z-index: 98;
         @include m.screen (m.$tablet) {
             padding: v.$padding-lg;
             justify-content: center;
