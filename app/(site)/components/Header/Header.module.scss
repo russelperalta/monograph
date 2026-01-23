@@ -7,11 +7,14 @@
         top: 0;
         left: 0;
         z-index: 99;
-        padding: v.$padding-md;
+        display: block;
         opacity: 0;
         transition: 0.3s opacity ease-in-out;
+        padding: v.$padding;
+        @include m.screen (m.$tablet) {
+            padding: v.$padding-md;
+        }
         &.scrolled {
-            display:block;
             opacity: 1;
         }
         a {
@@ -29,12 +32,13 @@
         bottom: 0;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        // justify-content: center;
         color: rgba(255,255,255,0.4);
         gap: 1.5rem;
         padding: v.$padding;
         @include m.screen (m.$tablet) {
             padding: v.$padding-lg;
+            justify-content: center;
         }
         z-index: 99;
         li {
