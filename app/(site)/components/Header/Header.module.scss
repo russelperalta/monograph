@@ -6,11 +6,11 @@
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 99;
         display: block;
         opacity: 0;
         transition: 0.3s opacity ease-in-out;
-        padding: v.$padding;
+        padding: calc(v.$padding + env(safe-area-inset-top));
+        z-index: 100;
         @include m.screen (m.$tablet) {
             padding: v.$padding-md;
         }
@@ -29,18 +29,18 @@
         position: fixed;
         top: 0;
         right: 0;
-        bottom: 0;
+        height: 100dvh;
         display: flex;
         flex-direction: column;
         // justify-content: center;
         color: rgba(255,255,255,0.4);
         gap: 1.5rem;
-        padding: v.$padding;
+        padding: calc(v.$padding + env(safe-area-inset-right));
+        z-index: 99;
         @include m.screen (m.$tablet) {
             padding: v.$padding-lg;
             justify-content: center;
         }
-        z-index: 99;
         li {
             list-style-type: none;
             a {
