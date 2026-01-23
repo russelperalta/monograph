@@ -20,16 +20,19 @@
   z-index: 1;
 }
 .scrollSections {
-  position: relative;
+  position: absolute;
   z-index: 0;
   top: 0;
   left: 0;
   width: 1px;
   height: auto;
+  pointer-events: none;
 }
 .scrollSection {
   height: 100dvh;
   display: block;
+  margin: 0;
+  padding: 0;
 }
 // .section {
     //   height: 100dvh;
