@@ -7,10 +7,6 @@ html, body {
     }
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
-    @include screen ($tablet) {
-        position: fixed;
-        overflow: hidden;
-    }
 }
 
 .layout {
