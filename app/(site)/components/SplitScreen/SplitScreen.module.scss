@@ -172,17 +172,15 @@
   }
 }
 
-:global(html) {
-  scroll-snap-type: y mandatory;
-  // Ensures scrolling is smooth and snappy on iOS
-  -webkit-overflow-scrolling: touch;
+:global(html),
+:global(body) {
   height: 100%;
-  overflow-y: scroll;
+  overflow: hidden; // Lock body scroll on mobile to use wrapper instead
 
   @include m.screen(m.$tablet) {
-    scroll-snap-type: none;
     height: auto;
-    overflow-y: visible;
+    overflow: visible; // Restore normal behavior on desktop
+    overflow-x: hidden;
   }
 }
 
@@ -192,7 +190,6 @@
   scrollbar-width: none;
   /* Firefox */
   scroll-behavior: auto;
-  min-height: 100%;
 }
 
 :global(#contact) {
@@ -247,7 +244,10 @@
 
 // Mobile
 .mobileWrapper {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
   // scroll-behavior: smooth;
 }
 
