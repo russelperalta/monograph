@@ -95,6 +95,8 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
             if (window.location.hash !== hash) {
               window.history.replaceState(null, '', hash || window.location.pathname);
             }
+            // Dispatch event for Header sync
+            window.dispatchEvent(new CustomEvent('section-change', { detail: { slug: slug } }));
           }
         }
       });
@@ -149,7 +151,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
   return (
     <>
       {isMobile ? (
-        <div className={styles.mobileWrapper} ref={mobileWrapperRef}>
+        <div className={styles.mobileWrapper} ref={mobileWrapperRef} id="mobile-scroll-wrapper">
           {posts.map((post, index) => (
             <section
               key={post._id}
