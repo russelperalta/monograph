@@ -90,8 +90,19 @@ export default function Header() {
         }
     }, [posts])
 
-    const handleNavClick = (slug: string) => {
+    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, slug: string, index: number) => {
+        e.preventDefault()
         setActiveSlug(slug)
+        
+        // Update URL
+        window.history.pushState(null, '', `#${slug}`)
+        
+        // Scroll to section
+        const windowHeight = window.innerHeight
+        window.scrollTo({
+            top: index * windowHeight,
+            behavior: 'smooth'
+        })
     }
     const navPosts = posts.slice(1)
 
@@ -110,7 +121,7 @@ export default function Header() {
                         <Link
                             href={`#${post.slug.current}`}
                             className={activeSlug === post.slug.current ? styles.active : ''}
-                            onClick={() => handleNavClick(post.slug.current)}
+                            onClick={(e) => handleNavClick(e, post.slug.current, index + 1)}
                         >
                             {/* {post.order} */}
                             {(index + 1).toString().padStart(2, '0')}
