@@ -13,7 +13,7 @@ interface SplitScreenScrollProps {
 
 const portableTextComponents = {
   types: {
-    image: ({value}: any) => {
+    image: ({ value }: any) => {
       if (!value?.asset?._ref) return null;
       return (
         <img
@@ -26,22 +26,22 @@ const portableTextComponents = {
     },
   },
   block: {
-    normal: ({children}: any) => {
+    normal: ({ children }: any) => {
       if (children.length === 1 && children[0] === '') return null;
       return <p className={styles.paragraph}>{children}</p>;
     },
-    h2: ({children}: any) => <h2 className={styles.h2}>{children}</h2>,
-    h3: ({children}: any) => <h3 className={styles.h3}>{children}</h3>,
+    h2: ({ children }: any) => <h2 className={styles.h2}>{children}</h2>,
+    h3: ({ children }: any) => <h3 className={styles.h3}>{children}</h3>,
   },
   marks: {
-    strong: ({children}: any) => <strong>{children}</strong>,
-    em: ({children}: any) => <em>{children}</em>,
-    link: ({children, value}: any) => {
+    strong: ({ children }: any) => <strong>{children}</strong>,
+    em: ({ children }: any) => <em>{children}</em>,
+    link: ({ children, value }: any) => {
       const href = value?.href || '';
       const isContactLink = href.startsWith('mailto:') || href.startsWith('tel:');
       return (
-        <a 
-          href={href} 
+        <a
+          href={href}
           target={isContactLink ? undefined : "_blank"}
           rel={isContactLink ? undefined : "noopener noreferrer"}
           className={styles.link}
@@ -60,7 +60,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
   const [overlayContent, setOverlayContent] = useState<any>(null);
   const [overlayTitle, setOverlayTitle] = useState<string>('');
   const [overlayGallery, setOverlayGallery] = useState<any[]>([]);
-  
+
   const isAnimatingRef = useRef(false);
   const mobileWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -77,8 +77,8 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
     if (posts.length === 0) return;
 
     const options = {
-      root: isMobile ? mobileWrapperRef.current : null,
-      threshold: 0.5, 
+      root: null, // Always use viewport as root to avoid mobile crashes
+      threshold: 0.5,
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -139,7 +139,7 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
     setTimeout(() => {
       setOverlayTitle('');
       setOverlayContent([]);
-      setOverlayGallery([]); 
+      setOverlayGallery([]);
     }, 300);
   };
 
@@ -151,8 +151,8 @@ export default function SplitScreenScroll({ posts }: SplitScreenScrollProps) {
       {isMobile ? (
         <div className={styles.mobileWrapper} ref={mobileWrapperRef}>
           {posts.map((post, index) => (
-            <section 
-              key={post._id} 
+            <section
+              key={post._id}
               id={post.slug.current} // Keeps your ID
               className={styles.mobileSection}
               data-anchor={post.slug.current}
