@@ -176,9 +176,13 @@
   scroll-snap-type: y mandatory;
   // Ensures scrolling is smooth and snappy on iOS
   -webkit-overflow-scrolling: touch;
+  height: 100%;
+  overflow-y: scroll;
 
   @include m.screen(m.$tablet) {
     scroll-snap-type: none;
+    height: auto;
+    overflow-y: visible;
   }
 }
 
@@ -188,6 +192,7 @@
   scrollbar-width: none;
   /* Firefox */
   scroll-behavior: auto;
+  min-height: 100%;
 }
 
 :global(#contact) {
